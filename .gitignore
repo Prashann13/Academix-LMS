@@ -54,8 +54,6 @@ htmlcov/
 .pytest_cache/
 .tox/
 
-
-.claude/
 vector_db/
 cache/
 uploads/
