@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card p-4">
+      <div class="text-center mb-4">
+        {% if user.profile_picture %}
+          <img src="{{ user.profile_picture.url }}" alt="Profile picture"
+               class="rounded-circle mb-2" width="96" height="96"
+               style="object-fit:cover; box-shadow: var(--lms-shadow);">
+        {% else %}
+          <i class="bi bi-person-circle text-body-secondary" style="font-size: 3.5rem;"></i>
+        {% endif %}
+        <h4 class="mt-2 mb-0">{{ user.get_full_name|default:user.username }}</h4>
+        <span class="role-badge role-{{ user.role|lower }} mt-2">
+          <i class="bi bi-shield-check"></i> {{ user.get_role_display }}
+        </span>
+      </div>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="mb-3">
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+            {% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+          </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-check-lg me-1"></i>Save Changes
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

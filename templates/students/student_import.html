@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-9">
+
+    <div class="card p-4 mb-4">
+      <h3 class="mb-1"><i class="bi bi-filetype-csv me-2 text-primary"></i>{{ title }}</h3>
+      <p class="text-body-secondary mb-4">
+        Upload a CSV to bulk-create student accounts (e.g. 500 at once).
+        Required columns: <code>username</code>, <code>first_name</code>,
+        <code>last_name</code>, <code>email</code>. Optional:
+        <code>phone_number</code>, <code>program</code> (exact Program name),
+        <code>level</code> (100&ndash;400), <code>date_of_birth</code> (YYYY-MM-DD),
+        <code>address</code>.
+      </p>
+
+      <form method="post" enctype="multipart/form-data" id="importForm">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.csv_file.id_for_label }}">{{ form.csv_file.label }}</label>
+          {{ form.csv_file }}
+          <div class="form-text">{{ form.csv_file.help_text }}</div>
+          {% for error in form.csv_file.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.default_password.id_for_label }}">{{ form.default_password.label }}</label>
+          {{ form.default_password }}
+          <div class="form-text">{{ form.default_password.help_text }}</div>
+          {% for error in form.default_password.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="form-check form-switch mb-4">
+          {{ form.skip_duplicates }}
+          <label class="form-check-label" for="{{ form.skip_duplicates.id_for_label }}">
+            {{ form.skip_duplicates.label }}
+          </label>
+          <div class="form-text">{{ form.skip_duplicates.help_text }}</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="importBtn">
+          <i class="bi bi-upload me-1"></i>Import students
+        </button>
+        <a href="{% url 'student_list' %}" class="btn btn-outline-secondary">
+          <i class="bi bi-x-lg me-1"></i>Cancel
+        </a>
+
+        <div id="csvPreview" class="mt-4" hidden>
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <h6 class="mb-0"><i class="bi bi-eye me-1"></i>File preview</h6>
+            <span class="badge text-bg-secondary" id="csvRowCount"></span>
+            <span class="badge" id="csvHeaderCheck"></span>
+          </div>
+          <div class="table-responsive" style="max-height: 260px; overflow-y: auto;">
+            <table class="table table-sm table-hover mb-0" id="csvPreviewTable"></table>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    {% if result %}
+    <div class="card p-4 mb-4 fade-in">
+      <h4 class="mb-3"><i class="bi bi-clipboard-check me-2 text-primary"></i>Import results</h4>
+      <div class="row g-3 mb-3">
+        <div class="col-6 col-md-3"><div class="p-2 rounded text-center" style="background:var(--lms-surface-alt);">
+          <div class="fs-4 fw-bold">{{ summary.total }}</div><div class="small text-body-secondary">total rows</div></div></div>
+        <div class="col-6 col-md-3"><div class="p-2 rounded text-center" style="background:var(--lms-surface-alt);">
+          <div class="fs-4 fw-bold text-success">{{ summary.created }}</div><div class="small text-body-secondary">created</div></div></div>
+        <div class="col-6 col-md-3"><div class="p-2 rounded text-center" style="background:var(--lms-surface-alt);">
+          <div class="fs-4 fw-bold text-primary">{{ summary.updated }}</div><div class="small text-body-secondary">updated</div></div></div>
+        <div class="col-6 col-md-3"><div class="p-2 rounded text-center" style="background:var(--lms-surface-alt);">
+          <div class="fs-4 fw-bold text-warning-emphasis">{{ summary.skipped }}</div><div class="small text-body-secondary">skipped</div></div></div>
+      </div>
+
+      <h6 class="mb-2">Per-row details</h6>
+      <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+        <table class="table table-sm table-hover mb-0" data-table-search>
+          <thead>
+            <tr>
+              <th data-sortable="true">Line</th>
+              <th data-sortable="true">Username</th>
+              <th data-sortable="true">Status</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in result.rows %}
+            <tr>
+              <td>{{ r.line }}</td>
+              <td>{{ r.username }}</td>
+              <td>
+                {% if r.action == "created" %}<span class="badge text-bg-success">created</span>
+                {% elif r.action == "updated" %}<span class="badge text-bg-primary">updated</span>
+                {% elif r.action == "skipped" %}<span class="badge text-bg-warning text-dark">skipped</span>
+                {% else %}<span class="badge text-bg-danger">failed</span>{% endif %}
+              </td>
+              <td class="text-body-secondary">{{ r.messages|join:"; "|default:"—" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="text-body-secondary small">
+      <i class="bi bi-info-circle me-1"></i>No CSV handy?
+      <a href="#" id="downloadTemplate" download="students_template.csv">Download a template</a>
+      with the correct header row.
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  var REQUIRED = ["username", "first_name", "last_name", "email"];
+  var OPTIONAL = ["phone_number", "program", "level", "date_of_birth", "address"];
+  var MAX_PREVIEW_ROWS = 50;
+
+  var fileInput = document.getElementById("id_csv_file");
+  var preview = document.getElementById("csvPreview");
+  var previewTable = document.getElementById("csvPreviewTable");
+  var rowCount = document.getElementById("csvRowCount");
+  var headerCheck = document.getElementById("csvHeaderCheck");
+  var form = document.getElementById("importForm");
+  var importBtn = document.getElementById("importBtn");
+
+  if (fileInput) {
+    fileInput.addEventListener("change", function () {
+      var file = fileInput.files[0];
+      preview.hidden = true;
+      if (!file) return;
+
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        var lines = String(e.target.result).split(/\r?\n/).filter(function (l) {
+          return l.trim() !== "";
+        });
+        if (lines.length === 0) return;
+
+        var headers = lines[0].split(",").map(function (h) {
+          return h.trim().toLowerCase();
+        });
+
+        var missing = REQUIRED.filter(function (c) {
+          return headers.indexOf(c) === -1;
+        });
+
+        renderPreview(headers, lines.slice(1), missing);
+      };
+      reader.readAsText(file);
+    });
+  }
+
+  function renderPreview(headers, dataLines, missing) {
+    var thead = "<thead><tr>";
+    headers.forEach(function (h) {
+      var isReq = REQUIRED.indexOf(h) !== -1;
+      thead += "<th>" + esc(h) + (isReq ? ' <i class="bi bi-asterisk text-danger" style="font-size:0.6em;"></i>' : "") + "</th>";
+    });
+    thead += "</tr></thead>";
+
+    var shown = dataLines.slice(0, MAX_PREVIEW_ROWS);
+    var tbody = "<tbody>";
+    shown.forEach(function (line) {
+      var cells = line.split(",");
+      tbody += "<tr>";
+      for (var i = 0; i < headers.length; i++) {
+        tbody += "<td>" + esc(cells[i] || "") + "</td>";
+      }
+      tbody += "</tr>";
+    });
+    tbody += "</tbody>";
+
+    previewTable.innerHTML = thead + tbody;
+    rowCount.textContent = dataLines.length + " rows";
+    if (dataLines.length > MAX_PREVIEW_ROWS) {
+      rowCount.textContent += " (first " + MAX_PREVIEW_ROWS + " shown)";
+    }
+
+    if (missing.length) {
+      headerCheck.className = "badge text-bg-danger";
+      headerCheck.textContent = "missing: " + missing.join(", ");
+    } else {
+      headerCheck.className = "badge text-bg-success";
+      headerCheck.textContent = "columns OK";
+    }
+    preview.hidden = false;
+  }
+
+  function esc(s) {
+    var d = document.createElement("div");
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  if (form) {
+    form.addEventListener("submit", function (e) {
+      var file = fileInput.files[0];
+      if (file) {
+        var reader = new FileReader();
+        reader.onload = function (ev) {
+          var firstLine = String(ev.target.result).split(/\r?\n/)[0] || "";
+          var headers = firstLine.split(",").map(function (h) {
+            return h.trim().toLowerCase();
+          });
+          var missing = REQUIRED.filter(function (c) {
+            return headers.indexOf(c) === -1;
+          });
+          if (missing.length) {
+            e.preventDefault();
+            headerCheck.className = "badge text-bg-danger";
+            headerCheck.textContent = "missing: " + missing.join(", ");
+            preview.hidden = false;
+            alert("CSV is missing required column(s): " + missing.join(", "));
+          }
+        };
+        reader.readAsText(file.slice(0, 4096));
+      }
+    });
+  }
+
+  var dl = document.getElementById("downloadTemplate");
+  if (dl) {
+    dl.addEventListener("click", function (e) {
+      var cols = REQUIRED.concat(OPTIONAL);
+      var rows = [
+        "student001,Ada,Lovelace,ada@example.com,08030000001,B.Sc. Computer Science,100,2006-03-12,Hostel A",
+        "student002,Chinwe,Eze,chinwe@example.com,08030000002,B.Sc. Computer Science,200,2005-07-24,Hostel B",
+        "student003,Emeka,Obi,emeka@example.com,08030000003,,100,,",
+      ];
+      var csv = cols.join(",") + "\n" + rows.join("\n") + "\n";
+      var blob = new Blob([csv], { type: "text/csv" });
+      dl.href = URL.createObjectURL(blob);
+    });
+  }
+
+  if (form && importBtn) {
+    form.addEventListener("submit", function () {
+      importBtn.disabled = true;
+      importBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Importing…';
+    });
+  }
+})();
+</script>
+{% endblock %}

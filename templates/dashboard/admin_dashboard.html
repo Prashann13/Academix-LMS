@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center gap-3 mb-4">
+  <div>
+    <h3 class="mb-0">Welcome back, {{ user.get_full_name|default:user.username }}</h3>
+    <span class="role-badge role-admin mt-1"><i class="bi bi-shield-check"></i> Administrator</span>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card stat-forest">
+      <i class="bi bi-people stat-icon"></i>
+      <div class="stat-value" data-counter="{{ total_students }}">0</div>
+      <div class="stat-label">Students</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card stat-gold">
+      <i class="bi bi-person-video3 stat-icon"></i>
+      <div class="stat-value" data-counter="{{ total_lecturers }}">0</div>
+      <div class="stat-label">Lecturers</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card stat-sage">
+      <i class="bi bi-journal-bookmark stat-icon"></i>
+      <div class="stat-value" data-counter="{{ total_courses }}">0</div>
+      <div class="stat-label">Courses</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card stat-olive">
+      <i class="bi bi-diagram-3 stat-icon"></i>
+      <div class="stat-value" data-counter="{{ total_programs }}">0</div>
+      <div class="stat-label">Programs</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <div class="card p-3 h-100">
+      <h5><i class="bi bi-calendar3 me-2 text-primary"></i>Current Session</h5>
+      <p class="fs-5 mb-3">{{ current_session|default:"Not set" }}</p>
+      <a href="{% url 'session_list' %}" class="btn btn-sm btn-outline-primary">
+        Manage Sessions <i class="bi bi-arrow-right ms-1"></i>
+      </a>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card p-3 h-100">
+      <h5><i class="bi bi-hourglass-split me-2 text-primary"></i>Current Semester</h5>
+      <p class="fs-5 mb-3">{{ current_semester|default:"Not set" }}</p>
+      <a href="{% url 'semester_list' %}" class="btn btn-sm btn-outline-primary">
+        Manage Semesters <i class="bi bi-arrow-right ms-1"></i>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="card p-3">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h5 class="mb-0"><i class="bi bi-megaphone me-2 text-primary"></i>Recent News &amp; Events</h5>
+    <a href="{% url 'news_list' %}" class="btn btn-sm btn-outline-secondary">View all</a>
+  </div>
+  <ul class="list-group list-group-flush">
+    {% for n in news %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <a href="{% url 'news_detail' n.pk %}">{{ n.title }}</a>
+        <span class="role-badge role-student">{{ n.posted_as }}</span>
+      </li>
+    {% empty %}
+      <li class="list-group-item">
+        <div class="empty-state py-4"><i class="bi bi-inbox"></i>No news posted yet.</div>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

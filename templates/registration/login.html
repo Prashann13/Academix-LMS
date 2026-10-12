@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block auth_content %}
+<div class="auth-body">
+  <form method="post">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+    {% endif %}
+    <div class="mb-3">
+      <label class="form-label" for="{{ form.username.id_for_label }}">Username</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-person"></i></span>
+        {{ form.username }}
+      </div>
+    </div>
+    <div class="mb-4">
+      <label class="form-label" for="{{ form.password.id_for_label }}">Password</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-key"></i></span>
+        {{ form.password }}
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary w-100">
+      <i class="bi bi-box-arrow-in-right me-1"></i>Login
+    </button>
+  </form>
+</div>
+{% endblock %}

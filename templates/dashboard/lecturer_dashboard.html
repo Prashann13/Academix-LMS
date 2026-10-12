@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Lecturer Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+<div class="mb-4">
+  <h3 class="mb-0">Welcome back, {{ user.get_full_name|default:user.username }}</h3>
+  <span class="role-badge role-lecturer mt-1"><i class="bi bi-shield-check"></i> Lecturer</span>
+</div>
+
+{% if lecturer %}
+<div class="card p-3 mb-4">
+  <div class="row">
+    <div class="col-md-4"><span class="text-muted">Staff ID:</span> <strong>{{ lecturer.staff_id }}</strong></div>
+    <div class="col-md-4"><span class="text-muted">Department:</span> <strong>{{ lecturer.department|default:"—" }}</strong></div>
+    <div class="col-md-4"><span class="text-muted">Office:</span> <strong>{{ lecturer.office|default:"—" }}</strong></div>
+  </div>
+</div>
+{% endif %}
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card p-3 h-100">
+      <h5><i class="bi bi-diagram-2 me-2 text-primary"></i>My Course Allocations</h5>
+      <ul class="list-group list-group-flush">
+        {% for a in allocations %}
+          <li class="list-group-item">
+            <strong>{{ a.session }}</strong>
+            <div class="mt-1 d-flex flex-wrap gap-1">
+              {% for c in a.courses.all %}
+                <a href="{% url 'course_detail' c.pk %}" class="badge rounded-pill text-bg-primary text-decoration-none">{{ c.code }}</a>
+              {% empty %}
+                <span class="text-muted">No courses in this allocation.</span>
+              {% endfor %}
+            </div>
+          </li>
+        {% empty %}
+          <li class="list-group-item">
+            <div class="empty-state py-4"><i class="bi bi-inbox"></i>No courses allocated yet.</div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card p-3 mb-3">
+      <h5><i class="bi bi-lightning-charge me-2 text-primary"></i>Quick Actions</h5>
+      <a href="{% url 'record_list' %}" class="btn btn-outline-primary w-100 mb-2">
+        <i class="bi bi-clipboard-data me-1"></i>Enter / Update Grades
+      </a>
+      <a href="{% url 'student_list' %}" class="btn btn-outline-secondary w-100">
+        <i class="bi bi-people me-1"></i>View Students
+      </a>
+    </div>
+
+    <div class="card p-3">
+      <h5><i class="bi bi-megaphone me-2 text-primary"></i>Recent News &amp; Events</h5>
+      <ul class="list-group list-group-flush">
+        {% for n in news %}
+          <li class="list-group-item"><a href="{% url 'news_detail' n.pk %}">{{ n.title }}</a></li>
+        {% empty %}
+          <li class="list-group-item text-muted">No news posted yet.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

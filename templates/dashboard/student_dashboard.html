@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Student Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+<div class="mb-4">
+  <h3 class="mb-0">Welcome back, {{ user.get_full_name|default:user.username }}</h3>
+  <span class="role-badge role-student mt-1"><i class="bi bi-shield-check"></i> Student</span>
+</div>
+
+{% if student %}
+<div class="card p-3 mb-4">
+  <div class="row">
+    <div class="col-md-4"><span class="text-muted">Matric No:</span> <strong>{{ student.matric_number }}</strong></div>
+    <div class="col-md-4"><span class="text-muted">Program:</span> <strong>{{ student.program|default:"—" }}</strong></div>
+    <div class="col-md-4"><span class="text-muted">Level:</span> <strong>{{ student.get_level_display }}</strong></div>
+  </div>
+</div>
+{% endif %}
+
+<div class="card p-3 mb-4">
+  <h5 class="mb-3"><i class="bi bi-clipboard-data me-2 text-primary"></i>My Courses &amp; Grades</h5>
+  <div class="table-responsive">
+    <table class="table table-sm table-hover mb-0" data-table-search>
+      <thead>
+        <tr>
+          <th data-sortable="true">Course</th>
+          <th data-sortable="true">Session</th>
+          <th data-sortable="true">Semester</th>
+          <th data-sortable="true">Score</th>
+          <th data-sortable="true">Grade</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in taken_courses %}
+        <tr>
+          <td>{{ t.course.code }} - {{ t.course.title }}</td>
+          <td>{{ t.session }}</td>
+          <td>{{ t.get_semester_display }}</td>
+          <td>{{ t.score|default:"—" }}</td>
+          <td>
+            {% if t.grade %}
+              <span class="badge grade-badge-{{ t.grade }}">{{ t.grade }}</span>
+            {% else %}—{% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr class="empty-row"><td colspan="5">
+          <div class="empty-state"><i class="bi bi-inbox"></i>No academic records yet.</div>
+        </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card p-3">
+  <h5><i class="bi bi-megaphone me-2 text-primary"></i>Recent News &amp; Events</h5>
+  <ul class="list-group list-group-flush">
+    {% for n in news %}
+      <li class="list-group-item"><a href="{% url 'news_detail' n.pk %}">{{ n.title }}</a></li>
+    {% empty %}
+      <li class="list-group-item text-muted">No news posted yet.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

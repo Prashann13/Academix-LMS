@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card p-4">
+      <h3 class="mb-4">{{ title }}</h3>
+      <table class="table table-borderless">
+        <tbody>
+          {% for label, value in fields %}
+          <tr>
+            <th style="width: 220px;" class="text-muted">{{ label }}</th>
+            <td>{{ value|default:"—" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <a href="javascript:history.back()" class="btn btn-outline-secondary" style="width: fit-content;">
+        <i class="bi bi-arrow-left me-1"></i>Back
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

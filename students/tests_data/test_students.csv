@@ -1,0 +1,22 @@
+username,first_name,last_name,email,phone_number,program,level,date_of_birth,address
+test001,Ada,Lovelace,ada@example.com,08030000001,B.Sc. Computer Science,100,2006-03-12,Hostel Block A Room 12
+test002,Chinwe,Eze,chinwe@example.com,08030000002,B.Sc. Computer Science,200,2005-07-24,Hostel Block B Room 4
+test003,Emeka,Obi,emeka@example.com,08030000003,,300,2004-11-05,12 Unity Street Lagos
+test004,Fatima,Bello,fatima@example.com,,B.Sc. Computer Science,400,2003-01-30,
+test005,Tunde,Adeyemi,tunde@example.com,08030000005,B.Sc. Computer Science,100,,
+test006,Grace,Okafor,grace@example.com,08030000006,Unknown Program Name,100,2006-09-09,Hostel Block C
+test007,Ibrahim,Musa,ibrahim@example.com,08030000007,B.Sc. Computer Science,250,2006-04-14,Hostel Block D
+test008,Ngozi,Eze,ngozi@example.com,08030000008,B.Sc. Computer Science,100,31-02-2006,Hostel Block A
+test009,Samuel,Johnson,samuel@example.com,08030000009,B.Sc. Computer Science,100,2006-08-21,Hostel Block B
+,,missingfields@example.com,08030000010,B.Sc. Computer Science,100,2006-02-02,Hostel Block A
+test011,Email,Taken,ada@example.com,08030000011,B.Sc. Computer Science,100,2006-05-05,Hostel Block C
+test012,Incomplete,Row,incomplete@example.com,08030000012,B.Sc. Computer Science,100,,
+test012,Duplicate,Username,duplicate@example.com,08030000013,B.Sc. Computer Science,100,2006-06-06,Hostel Block D
+test013,Amina,Yusuf,amina@example.com,08030000014,B.Sc. Computer Science,100,2005-12-01,5 Peace Avenue Abuja
+test014,Kelechi,Nwosu,kelechi@example.com,08030000015,B.Sc. Computer Science,200,2004-10-10,Hostel Block B Room 9
+test015,Zainab,Garba,zainab@example.com,08030000016,,300,2004-03-03,Hostel Block C Room 2
+test016,Bad,Email,not-an-email,08030000017,B.Sc. Computer Science,100,2006-01-01,Hostel Block A
+test017,Bola,Olatunji,bola@example.com,08030000018,B.Sc. Computer Science,400,2003-08-08,18 Palm Road Ibadan
+test018,Yakubu,Lawal,yakubu@example.com,08030000019,B.Sc. Computer Science,100,2006-07-07,Hostel Block D Room 5
+test019,Chiamaka,Okoro,chiamaka@example.com,08030000020,B.Sc. Computer Science,200,2005-02-28,Hostel Block B Room 11
+test020,Mohammed,Sani,mohammed@example.com,,B.Sc. Computer Science,100,2006-06-15,9 Mosque Street Kano

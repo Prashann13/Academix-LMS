@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load academix_extras %}
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <h3 class="mb-0">{{ title }}</h3>
+  {% if create_url %}
+    <a href="{% url create_url %}" class="btn btn-primary">
+      <i class="bi bi-plus-lg me-1"></i>Add New
+    </a>
+  {% endif %}
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0" data-table-search>
+      <thead>
+        <tr>
+          {% for f in fields %}<th data-sortable="true">{{ f|field_label }}</th>{% endfor %}
+          {% if detail_url or update_url or delete_url %}<th class="text-end">Actions</th>{% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for obj in object_list %}
+        <tr>
+          {% for f in fields %}
+            <td>{{ obj|getattribute:f }}</td>
+          {% endfor %}
+          {% if detail_url or update_url or delete_url %}
+          <td class="text-end">
+            <div class="d-flex gap-1 justify-content-end">
+              {% if detail_url %}<a href="{% url detail_url obj.pk %}" class="btn btn-sm btn-outline-secondary" title="View"><i class="bi bi-eye"></i></a>{% endif %}
+              {% if update_url %}<a href="{% url update_url obj.pk %}" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="bi bi-pencil"></i></a>{% endif %}
+              {% if delete_url %}<a href="{% url delete_url obj.pk %}" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></a>{% endif %}
+            </div>
+          </td>
+          {% endif %}
+        </tr>
+        {% empty %}
+        <tr class="empty-row"><td colspan="10">
+          <div class="empty-state">
+            <i class="bi bi-inbox"></i>
+            No records found.
+          </div>
+        </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% if is_paginated %}
+<nav class="mt-3">
+  <ul class="pagination">
+    {% if page_obj.has_previous %}
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}"><i class="bi bi-chevron-left"></i></a></li>
+    {% endif %}
+    <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+    {% if page_obj.has_next %}
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}"><i class="bi bi-chevron-right"></i></a></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+{% endblock %}

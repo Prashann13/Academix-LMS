@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Users{% endblock %}
+{% block page_title %}Users{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <h3 class="mb-0">All Users</h3>
+  <a href="{% url 'register_user' %}" class="btn btn-primary">
+    <i class="bi bi-person-plus me-1"></i>Create User
+  </a>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0" data-table-search>
+      <thead>
+        <tr>
+          <th data-sortable="true">Username</th>
+          <th data-sortable="true">Full Name</th>
+          <th data-sortable="true">Email</th>
+          <th data-sortable="true">Role</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              {% if u.profile_picture %}
+                <img src="{{ u.profile_picture.url }}" class="rounded-circle" width="28" height="28" style="object-fit:cover;" alt="">
+              {% else %}
+                <i class="bi bi-person-circle text-body-secondary fs-5"></i>
+              {% endif %}
+              {{ u.username }}
+            </div>
+          </td>
+          <td>{{ u.get_full_name }}</td>
+          <td>{{ u.email }}</td>
+          <td><span class="role-badge role-{{ u.role|lower }}">{{ u.get_role_display }}</span></td>
+          <td class="text-end">
+            <a href="{% url 'user_delete' u.pk %}" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr class="empty-row"><td colspan="5">
+          <div class="empty-state"><i class="bi bi-inbox"></i>No users found.</div>
+        </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

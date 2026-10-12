@@ -1,0 +1,12 @@
+# Normalize line endings so the repo is consistent across platforms.
+* text=auto
+
+*.py   text diff=python
+*.html text
+*.css  text
+*.js   text
+*.md   text
+
+*.png binary
+*.jpg binary
+*.pdf binary
