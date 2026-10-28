@@ -8,26 +8,7 @@ Stack: Python 3.10+ · Django 5.0+ · SQLite · Django templates · Bootstrap 5 
 
 \### Login
 
-!\[Login page](Screenshots/login.png)
-
-
-
-\### Dashboard
-
-!\[Dashboard](Screenshots/dashboard.png)
-
-
-
-\### Import
-
-!\[Login page](Screenshots/import.png)
-
-
-
-\### Admin
-
-!\[Login page](Screenshots/admin.png)
-
+!\[Login page](screenshots/login.png)
 
 
 ## Quick start
