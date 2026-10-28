@@ -6,10 +6,6 @@ Stack: Python 3.10+ · Django 5.0+ · SQLite · Django templates · Bootstrap 5 
 
 
 
-\### Login
-
-!\[Login page](screenshots/login.png)
-
 
 ## Quick start
 
